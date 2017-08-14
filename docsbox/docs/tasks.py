@@ -17,7 +17,7 @@ from docsbox.docs.utils import make_zip_archive, make_thumbnails
 def remove_file(path):
     """
     Just removes a file.
-    Used for deleting original files (uploaded by user) and result files (result of converting) 
+    Used for deleting original files (uploaded by user) and result files (result of converting)
     """
     return os.remove(path)
 
@@ -30,7 +30,8 @@ def process_document(path, options, meta):
             with TemporaryDirectory() as tmp_dir: # create temp dir where output'll be stored
                 for fmt in options["formats"]: # iterate over requested formats
                     current_format = app.config["SUPPORTED_FORMATS"][fmt]
-                    output_path = os.path.join(tmp_dir, current_format["path"])
+                    filename = "{0}.{1}".format(current_task.id, current_format["path"])
+                    output_path = os.path.join(tmp_dir, filename)
                     original_document.saveAs(output_path, fmt=current_format["fmt"])
                 if options.get("thumbnails", None):
                     is_created = False
