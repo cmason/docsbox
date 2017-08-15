@@ -1,6 +1,8 @@
 import os
 import zipfile
 
+from shutil import copyfile
+
 from wand.image import Image
 
 from docsbox import app
@@ -23,6 +25,18 @@ def make_zip_archive(uuid, tmp_dir):
     return result_path, result_url
 
 
+def make_result_file(uuid, tmp_dir):
+    tmp_files = os.listdir(tmp_dir)
+    if len(tmp_files) == 1:
+        tmp_file = tmp_files.pop()
+        result_path = os.path.join(app.config["MEDIA_PATH"], tmp_file)
+        result_url = os.path.join(app.config["MEDIA_URL"], tmp_file)
+        copyfile(os.path.join(tmp_dir, tmp_file), result_path)
+        return result_path, result_url
+    else:
+        return make_zip_archive(uuid, tmp_dir)
+
+
 def make_thumbnails(image, tmp_dir, size):
     thumbnails_folder = os.path.join(tmp_dir, "thumbnails/")
     os.mkdir(thumbnails_folder)
@@ -32,7 +46,7 @@ def make_thumbnails(image, tmp_dir, size):
             filename = os.path.join(thumbnails_folder, "{0}.png".format(index))
             page.resize(width, height)
             if app.config["THUMBNAILS_QUANTIZE"]:
-                page.quantize(app.config["THUMBNAILS_QUANTIZE_COLORS"], 
+                page.quantize(app.config["THUMBNAILS_QUANTIZE_COLORS"],
                               app.config["THUMBNAILS_QUANTIZE_COLORSPACE"], 0, True, True)
             page.save(filename=filename)
     else:
