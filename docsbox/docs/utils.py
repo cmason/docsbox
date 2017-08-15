@@ -24,15 +24,16 @@ def make_zip_archive(uuid, tmp_dir):
                 output.write(path, path.split(tmp_dir)[1])
     return result_path, result_url
 
+def make_single_file(tmp_file, tmp_dir):
+    result_path = os.path.join(app.config["MEDIA_PATH"], tmp_file)
+    result_url = os.path.join(app.config["MEDIA_URL"], tmp_file)
+    copyfile(os.path.join(tmp_dir, tmp_file), result_path)
+    return result_path, result_url
 
 def make_result_file(uuid, tmp_dir):
     tmp_files = os.listdir(tmp_dir)
     if len(tmp_files) == 1:
-        tmp_file = tmp_files.pop()
-        result_path = os.path.join(app.config["MEDIA_PATH"], tmp_file)
-        result_url = os.path.join(app.config["MEDIA_URL"], tmp_file)
-        copyfile(os.path.join(tmp_dir, tmp_file), result_path)
-        return result_path, result_url
+        return make_single_file(tmp_files.pop(), tmp_dir)
     else:
         return make_zip_archive(uuid, tmp_dir)
 
